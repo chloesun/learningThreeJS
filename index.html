@@ -19,30 +19,53 @@
 <body>
     <script src="js/three.js"></script>
     <script>
+        //create scene
         var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+        //create camera
+        //objects are visible between near clipping plane and far clipping plane
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        //
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         //game logic
-        var update = function(){
+        //GameLoop is the heart of every game, all the code that makes the game interactive and
+        // dynamic goes in the game loop
+        var update = function () {
 
         };
 
-        var render = function(){
+        var render = function () {
             renderer.render(scene, camera);
         };
 
-        var GameLoop = function(){
+        var GameLoop = function () {
             requestAnimationFrame(GameLoop);
             update();
             render();
         };
 
         GameLoop();
+
+
+        //create the shape
+        var geometry = new THREE.BoxGeometry(1, 1, 1);
+
+        //create a material, colour or image texture
+        var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: false });
+        var cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
         
+        //make the box visible
+        camera.position.z = 3;
+
+
+
+
+
     </script>
 </body>
 
