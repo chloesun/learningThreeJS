@@ -25,17 +25,35 @@
         //create camera
         //objects are visible between near clipping plane and far clipping plane
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        
+
         //
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        //create the shape
+        var geometry = new THREE.BoxGeometry(1, 1, 1);
+
+        //create a material, colour or image texture
+        var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
+        var cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // var geometry = new THREE.CylinderGeometry(4, 4, 10, 20);
+        // var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
+        // var cylinder = new THREE.Mesh(geometry, material);
+        // scene.add(cylinder);
+
+        //make the box visible
+        camera.position.z = 3;
+
+
         //game logic
         //GameLoop is the heart of every game, all the code that makes the game interactive and
         // dynamic goes in the game loop
         var update = function () {
-
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.005;
         };
 
         var render = function () {
@@ -51,16 +69,8 @@
         GameLoop();
 
 
-        //create the shape
-        var geometry = new THREE.BoxGeometry(1, 1, 1);
 
-        //create a material, colour or image texture
-        var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: false });
-        var cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        
-        //make the box visible
-        camera.position.z = 3;
+
 
 
 
