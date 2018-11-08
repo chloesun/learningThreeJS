@@ -47,12 +47,12 @@
         var geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
 
         var cubeMaterials = [
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), //right side
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // left side
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), //top side
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }),// bottom side
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // front side
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }) // back side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), //right side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // left side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), //top side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }),// bottom side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // front side
+            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }) // back side
         ];
 
         //create a material, colour or image texture
@@ -68,6 +68,19 @@
         //make the box visible
         camera.position.z = 3;
 
+        //add lights
+        var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
+        scene.add(ambientLight);
+
+        //light color, intensity, distance you want the light to reach
+        var light1 = new THREE.PointLight(0xFF0040, 4, 10);
+        scene.add(light1);
+
+        var light2 = new THREE.PointLight(0x0040FF, 1, 10);
+        scene.add(light2);
+
+        var light3 = new THREE.PointLight(0x80FF80, 20, 1);
+        scene.add(light3);
 
         //game logic
         //GameLoop is the heart of every game, all the code that makes the game interactive and
@@ -75,6 +88,19 @@
         var update = function () {
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.005;
+
+            var time = Date.now() * 0.0005;
+            light1.position.x = Math.sin(time * 0.7) * 30;
+            light1.position.y = Math.cos(time * 0.5) * 30;
+            light1.position.z = Math.cos(time * 0.3) * 30;
+
+            light2.position.x = Math.sin(time * 0.7) * 30;
+            light2.position.y = Math.cos(time * 0.5) * 30;
+            light2.position.z = Math.cos(time * 0.3) * 30;
+
+            light3.position.x = Math.sin(time * 0.7) * 30;
+            light3.position.y = Math.cos(time * 0.5) * 30;
+            light3.position.z = Math.cos(time * 0.3) * 30;
         };
 
         var render = function () {
