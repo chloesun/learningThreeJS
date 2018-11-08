@@ -18,6 +18,7 @@
 
 <body>
     <script src="js/three.js"></script>
+    <script src="js/OrbitControls.js"></script>
     <script>
         //create scene
         var scene = new THREE.Scene();
@@ -26,7 +27,6 @@
         //objects are visible between near clipping plane and far clipping plane
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        //
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -39,6 +39,9 @@
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
         })
+        
+        //able to manipulate 3d object
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
 
         //create the shape
         var geometry = new THREE.BoxGeometry(1, 1, 1);
