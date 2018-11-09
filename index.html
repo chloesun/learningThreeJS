@@ -19,110 +19,162 @@
 <body>
     <script src="js/three.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    <script src="js/ObjectLoader.js"></script>
     <script>
-        //create scene
-        var scene = new THREE.Scene();
-
-        //create camera
-        //objects are visible between near clipping plane and far clipping plane
-        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-        var renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        //keep the ratio when resizing, update viewport when resizing
-        window.addEventListener('resize', function () {
-            var width = window.innerWidth;
-            var height = window.innerHeight;
-            renderer.setSize(width, height);
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-        })
-
-        //able to manipulate 3d object
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-        //create the shape
-        var geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-
-        var cubeMaterials = [
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), //right side
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // left side
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), //top side
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }),// bottom side
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // front side
-            new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }) // back side
-        ];
-
-        //create a material, colour or image texture
-        var material = new THREE.MeshFaceMaterial(cubeMaterials);
-        var cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-
-        // var geometry = new THREE.CylinderGeometry(4, 4, 10, 20);
-        // var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
-        // var cylinder = new THREE.Mesh(geometry, material);
-        // scene.add(cylinder);
-
-        //make the box visible
-        camera.position.z = 3;
+        //create objects
+        var cube = getBox(1.5, 1.5, 1.5);
+        var plane = getPlane(15);
 
         //add lights
         var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
-        scene.add(ambientLight);
 
         //light color, intensity, distance you want the light to reach
         var light1 = new THREE.PointLight(0xFF0040, 4, 10);
-        scene.add(light1);
-
         var light2 = new THREE.PointLight(0x0040FF, 1, 10);
-        scene.add(light2);
-
         var light3 = new THREE.PointLight(0x80FF80, 20, 1);
-        scene.add(light3);
-
-        //game logic
-        //GameLoop is the heart of every game, all the code that makes the game interactive and
-        // dynamic goes in the game loop
-        var update = function () {
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.005;
-
-            var time = Date.now() * 0.0005;
-            light1.position.x = Math.sin(time * 0.7) * 30;
-            light1.position.y = Math.cos(time * 0.5) * 30;
-            light1.position.z = Math.cos(time * 0.3) * 30;
-
-            light2.position.x = Math.sin(time * 0.7) * 30;
-            light2.position.y = Math.cos(time * 0.5) * 30;
-            light2.position.z = Math.cos(time * 0.3) * 30;
-
-            light3.position.x = Math.sin(time * 0.7) * 30;
-            light3.position.y = Math.cos(time * 0.5) * 30;
-            light3.position.z = Math.cos(time * 0.3) * 30;
-        };
-
-        var render = function () {
-            renderer.render(scene, camera);
-        };
-
-        var GameLoop = function () {
-            requestAnimationFrame(GameLoop);
-            update();
-            render();
-        };
-
-        GameLoop();
 
 
+        function init() {
+            //create scene
+            var scene = new THREE.Scene();
+
+            //create camera
+            //objects are visible between near clipping plane and far clipping plane
+            //
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            //keep the ratio when resizing, update viewport when resizing
+            window.addEventListener('resize', function () {
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            })
+
+            //able to manipulate 3d object
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            //add objects to the scene
+            scene.add(plane);
+            scene.add(cube);
+
+            //add lights to the scene
+            scene.add(ambientLight);
+            scene.add(light1);
+            scene.add(light2);
+            scene.add(light3);
+
+            //make the box visible
+            camera.position.z = 3;
 
 
+            //game logic
+            //GameLoop is the heart of every game, all the code that makes the game interactive and
+            // dynamic goes in the game loop
+            var update = function () {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.005;
 
+                //make the lights rotate
+                var time = Date.now() * 0.0005;
+                light1.position.x = Math.sin(time * 0.7) * 30;
+                light1.position.y = Math.cos(time * 0.5) * 30;
+                light1.position.z = Math.cos(time * 0.3) * 30;
 
+                light2.position.x = Math.sin(time * 0.7) * 30;
+                light2.position.y = Math.cos(time * 0.5) * 30;
+                light2.position.z = Math.cos(time * 0.3) * 30;
 
+                light3.position.x = Math.sin(time * 0.7) * 30;
+                light3.position.y = Math.cos(time * 0.5) * 30;
+                light3.position.z = Math.cos(time * 0.3) * 30;
+            };
 
+            var render = function () {
+                renderer.render(scene, camera);
+            };
 
+            var GameLoop = function () {
+                requestAnimationFrame(GameLoop);
+                update();
+                render();
+            };
+
+            GameLoop();
+        }
+
+        //create ground plane
+        function getPlane(size) {
+            var geometry = new THREE.PlaneGeometry(size, size);
+            var material = new THREE.MeshBasicMaterial({
+                color: 0x00ff00,
+                side: THREE.DoubleSide
+            });
+
+            var mesh = new THREE.Mesh(geometry, material
+            );
+
+            return mesh;
+        }
+
+        //create box
+        function getBox(w, h, d) {
+            var geometry = new THREE.BoxGeometry(w, h, d);
+
+            var cubeMaterials = [
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), //right side
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // left side
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), //top side
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }),// bottom side
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // front side
+                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }) // back side
+            ];
+
+            //create a material, colour or image texture
+            var material = new THREE.MeshFaceMaterial(cubeMaterials);
+            var mesh = new THREE.Mesh(geometry, material);
+
+            return mesh;
+        }
+
+        //load a gltf model
+        // var loader = new THREE.GLTFLoader();
+
+        // loader.load(
+        //     // resource URL
+        //     'assets/scene.gltf',
+        //     // called when the resource is loaded
+        //     function (gltf) {
+
+        //         scene.add(gltf.scene);
+
+        //         gltf.animations; // Array<THREE.AnimationClip>
+        //         gltf.scene; // THREE.Scene
+        //         gltf.scenes; // Array<THREE.Scene>
+        //         gltf.cameras; // Array<THREE.Camera>
+        //         gltf.asset; // Object
+
+        //     },
+
+        //     // called while loading is progressing
+        //     function (xhr) {
+        //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        //     },
+
+        //     // called when loading has errors
+        //     function (error) {
+        //         console.log('An error happened');
+        //     }
+        // );
+
+        // start the program
+        init();
     </script>
 </body>
 
