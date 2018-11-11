@@ -1,181 +1,117 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<meta charset="utf-8" />
+		<title>My first three.js app</title>
+		<style>
+			body {
+				margin: 0;
+			}
 
-<head>
-    <meta charset=utf-8>
-    <title>My first three.js app</title>
-    <style>
-        body {
-            margin: 0;
-        }
+			canvas {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
 
-        canvas {
-            width: 100%;
-            height: 100%
-        }
-    </style>
-</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script>
+			// FPS
+			(function() {
+				var script = document.createElement('script');
+				script.onload = function() {
+					var stats = new Stats();
+					document.body.appendChild(stats.dom);
+					requestAnimationFrame(function loop() {
+						stats.update();
+						requestAnimationFrame(loop);
+					});
+				};
+				script.src = '//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';
+				document.head.appendChild(script);
+			})();
 
-<body>
-    <script src="js/three.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script src="js/GLTFLoader.js"></script>
-    <script src="js/ObjectLoader.js"></script>
-    <script>
-        //create objects
-        var cube = getBox(1.5, 1.5, 1.5);
-        var plane = getPlane(15);
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        //add lights
-        var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.0);
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
 
-        //light color, intensity, distance you want the light to reach
-        var light1 = new THREE.PointLight(0xFF0040, 4, 10);
-        var light2 = new THREE.PointLight(0x0040FF, 1, 10);
-        var light3 = new THREE.PointLight(0x80FF80, 20, 1);
+			// update viewport on resize
+			window.addEventListener('resize', function() {
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				renderer.setSize(width, height);
+				camera.aspect = width / height; //aspect ratio
+				camera.updateProjectionMatrix();
+			});
 
+			// controls
+			controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-        function init() {
-            //create scene
-            var scene = new THREE.Scene();
+			// creates the shape
+			var geometry = new THREE.CubeGeometry(250, 250, 250);
+			var cubeMaterials = [
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_ft.png'),
+					side: THREE.DoubleSide,
+				}), //front side
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_bk.png'),
+					side: THREE.DoubleSide,
+				}), //back side
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_up.png'),
+					side: THREE.DoubleSide,
+				}), //up side
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_dn.png'),
+					side: THREE.DoubleSide,
+				}), //down side
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_rt.png'),
+					side: THREE.DoubleSide,
+				}), //right side
+				new THREE.MeshBasicMaterial({
+					map: new THREE.TextureLoader().load('img/nightsky_lf.png'),
+					side: THREE.DoubleSide,
+				}), //left side
+			];
 
-            //create camera
-            //objects are visible between near clipping plane and far clipping plane
-            //
-            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+			var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
+			var cube = new THREE.Mesh(geometry, cubeMaterial);
+			scene.add(cube);
 
-            var renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+			// Camera Position
+			camera.position.z = 3;
 
-            //keep the ratio when resizing, update viewport when resizing
-            window.addEventListener('resize', function () {
-                var width = window.innerWidth;
-                var height = window.innerHeight;
-                renderer.setSize(width, height);
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-            })
+			// lighting
+			var ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+			scene.add(ambientLight);
 
-            //able to manipulate 3d object
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
+			//game logic
+			var update = function() {
+				//cube.rotation.x += 0.01;
+				//cube.rotation.y += 0.005;
+			};
 
-            //add objects to the scene
-            scene.add(plane);
-            scene.add(cube);
+			//render logic
+			var render = function() {
+				renderer.render(scene, camera);
+			};
 
-            //add lights to the scene
-            scene.add(ambientLight);
-            scene.add(light1);
-            scene.add(light2);
-            scene.add(light3);
+			//run game loop (update, render, repeat)
+			var GameLoop = function() {
+				requestAnimationFrame(GameLoop);
+				update();
+				render();
+			};
 
-            //make the box visible
-            camera.position.z = 3;
-
-
-            //game logic
-            //GameLoop is the heart of every game, all the code that makes the game interactive and
-            // dynamic goes in the game loop
-            var update = function () {
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.005;
-
-                //make the lights rotate
-                var time = Date.now() * 0.0005;
-                light1.position.x = Math.sin(time * 0.7) * 30;
-                light1.position.y = Math.cos(time * 0.5) * 30;
-                light1.position.z = Math.cos(time * 0.3) * 30;
-
-                light2.position.x = Math.sin(time * 0.7) * 30;
-                light2.position.y = Math.cos(time * 0.5) * 30;
-                light2.position.z = Math.cos(time * 0.3) * 30;
-
-                light3.position.x = Math.sin(time * 0.7) * 30;
-                light3.position.y = Math.cos(time * 0.5) * 30;
-                light3.position.z = Math.cos(time * 0.3) * 30;
-            };
-
-            var render = function () {
-                renderer.render(scene, camera);
-            };
-
-            var GameLoop = function () {
-                requestAnimationFrame(GameLoop);
-                update();
-                render();
-            };
-
-            GameLoop();
-        }
-
-        //create ground plane
-        function getPlane(size) {
-            var geometry = new THREE.PlaneGeometry(size, size);
-            var material = new THREE.MeshBasicMaterial({
-                color: 0x00ff00,
-                side: THREE.DoubleSide
-            });
-
-            var mesh = new THREE.Mesh(geometry, material
-            );
-
-            return mesh;
-        }
-
-        //create box
-        function getBox(w, h, d) {
-            var geometry = new THREE.BoxGeometry(w, h, d);
-
-            var cubeMaterials = [
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }), //right side
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // left side
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }), //top side
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/1.png'), side: THREE.DoubleSide }),// bottom side
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/2.png'), side: THREE.DoubleSide }), // front side
-                new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('img/3.png'), side: THREE.DoubleSide }) // back side
-            ];
-
-            //create a material, colour or image texture
-            var material = new THREE.MeshFaceMaterial(cubeMaterials);
-            var mesh = new THREE.Mesh(geometry, material);
-
-            return mesh;
-        }
-
-        //load a gltf model
-        // var loader = new THREE.GLTFLoader();
-
-        // loader.load(
-        //     // resource URL
-        //     'assets/scene.gltf',
-        //     // called when the resource is loaded
-        //     function (gltf) {
-
-        //         scene.add(gltf.scene);
-
-        //         gltf.animations; // Array<THREE.AnimationClip>
-        //         gltf.scene; // THREE.Scene
-        //         gltf.scenes; // Array<THREE.Scene>
-        //         gltf.cameras; // Array<THREE.Camera>
-        //         gltf.asset; // Object
-
-        //     },
-
-        //     // called while loading is progressing
-        //     function (xhr) {
-        //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-        //     },
-
-        //     // called when loading has errors
-        //     function (error) {
-        //         console.log('An error happened');
-        //     }
-        // );
-
-        // start the program
-        init();
-    </script>
-</body>
-
+			GameLoop();
+		</script>
+	</body>
 </html>
